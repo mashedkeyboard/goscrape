@@ -1,0 +1,2 @@
+# goscrape
+I don't advise actually using this. This is the first thing I've ever written in Go and it's probably horribly janky. In theory, though, it should scrape links from a given webpage and output them to stdout, being sorted into their pages and subpages.
