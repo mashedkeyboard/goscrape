@@ -1,9 +1,9 @@
 package main
 
 import (
-	"net/http"
 	"golang.org/x/net/html"
 	"log"
+	"net/http"
 	"strings"
 )
 
@@ -18,7 +18,7 @@ func fetchUrl(link linkToCrawl, workerNum int) {
 		log.Println("Errored while fetching link ", link.url, " (error: ", err, ")")
 		return
 	}
-	
+
 	if resp.Header.Get("Content-Type") == "text/html" || strings.HasPrefix(resp.Header.Get("Content-Type"), "text/html;") {
 		doc, err = html.Parse(resp.Body)
 		if err != nil {

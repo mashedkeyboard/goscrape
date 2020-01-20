@@ -1,8 +1,9 @@
 package main
+
 import (
-	"sync"
 	"go.uber.org/ratelimit"
 	"net/url"
+	"sync"
 )
 
 const maxDepth, queueLength, threads int = 2, 4096, 5

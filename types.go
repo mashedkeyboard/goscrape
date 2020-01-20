@@ -1,30 +1,30 @@
 package main
 
 import (
-	"sync"
 	"log"
+	"sync"
 )
 
 // Contains our urlLists and lets us lock them using sync's mutex lock.
 // This means we can prevent two threads trying to write to a urlList at once.
 type urlListContainer struct {
 	list urlList
-	mux sync.Mutex
+	mux  sync.Mutex
 }
 
 // The actual urlList. These have a url, which would be the root URL initially,
 // and then contain a map of other urlLists, whose keys are the URLs that they have.
 type urlList struct {
-	url string
+	url     string
 	suburls map[string]*urlList
 }
 
 // linkToCrawl is - shockingly enough - a link that we're going to crawl.
 // It has a URL, a parent so it can be ordered, and a depth so we know when to stop.
 type linkToCrawl struct {
-	url string
+	url        string
 	parentLink *linkToCrawl
-	depth int
+	depth      int
 }
 
 // A syncedLinkQueue is a struct of a channel (effectively used as a queue for links),
@@ -33,10 +33,9 @@ type linkToCrawl struct {
 // or closing the channel.
 type syncedLinkQueue struct {
 	channel chan linkToCrawl
-	done bool
-	mux sync.Mutex
+	done    bool
+	mux     sync.Mutex
 }
-
 
 // A visitLog is a log of visited URLs. It has a map of URL strings against booleans.
 // The boolean here will always be true for anything that exists in the map. It's
@@ -45,7 +44,7 @@ type syncedLinkQueue struct {
 // trying to put a visit into the log and a thread trying to check.
 type visitLog struct {
 	urls map[string]bool
-	mux sync.Mutex
+	mux  sync.Mutex
 }
 
 // Acts on a urlListContainer to add a link to the underlying urlList
@@ -61,7 +60,7 @@ func (u *urlListContainer) addLink(link linkToCrawl) {
 			break
 		}
 	}
-	if linkTree[len(linkTree) - 1].url != startUrl.String() {
+	if linkTree[len(linkTree)-1].url != startUrl.String() {
 		// something is very wrong, this should never ever occur
 		// if this happens - welp, we need to quit
 		log.Fatal("linkTree initial URL didn't match start URL for link ", link.url)
@@ -92,7 +91,7 @@ func (u *urlListContainer) addLink(link linkToCrawl) {
 			} else {
 				// if not, create it
 				sublist := new(urlList)
-				sublist.url = linkTree[i].url 
+				sublist.url = linkTree[i].url
 				// add the new urlList to the existing part of the workingUrlList through the pointer
 				(*currentUrlList).suburls[linkTree[i].url] = sublist
 				// then reset the currentUrlList pointer to the current head

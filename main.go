@@ -1,15 +1,15 @@
 package main
 
 import (
-	"log"
 	"fmt"
-	"strings"
-	"os"
 	"go.uber.org/ratelimit"
+	"log"
 	"net/url"
+	"os"
+	"strings"
 )
 
-func main(){
+func main() {
 	// initialise the visit log, queue, and rate limiter
 	visited.urls = make(map[string]bool)
 	linkQueue.channel = make(chan linkToCrawl, queueLength)
@@ -25,7 +25,7 @@ func main(){
 		log.Fatal("That wasn't a valid start URL. Please specify a valid start URL.")
 	}
 	startUrl = *u
-	
+
 	log.Println("Fetching first URL")
 	urls.list.url = startUrl.String()
 	// thread -1 indicates the main thread, so it won't try and check it or shut it down
@@ -43,11 +43,11 @@ func main(){
 	return
 }
 
-func printUrls(suburls map[string]*urlList, level int){
+func printUrls(suburls map[string]*urlList, level int) {
 	for url, urlList := range suburls {
 		fmt.Println(strings.Repeat("-", level), url)
 		if len((*urlList).suburls) > 0 {
-			printUrls((*urlList).suburls, level + 1)
+			printUrls((*urlList).suburls, level+1)
 		}
 	}
 }

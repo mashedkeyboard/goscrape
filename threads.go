@@ -4,7 +4,7 @@ import (
 	"log"
 )
 
-func crawlThread(workerNum int){
+func crawlThread(workerNum int) {
 	defer wg.Done()
 	workerStates[workerNum] = 0
 	log.Println("Thread ", workerNum, " now running")
