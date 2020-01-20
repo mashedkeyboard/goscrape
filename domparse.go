@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"golang.org/x/net/html"
 	"net/url"
 	"strings"
@@ -22,7 +21,12 @@ func parseNode(n *html.Node, link linkToCrawl, workerNum int) {
 						if len(url.Scheme) == 0 {
 							// if it doesn't validate as a request URL, but did validate as a URL,
 							// and has no scheme, it's probably a relative path
-							urlval = fmt.Sprint(startUrl.Scheme, "://", startUrl.Host, urlval)
+							// parse the current path and resolve relative to it
+							currentUrl, err := url.Parse(link.url)
+							if err != nil {
+								continue
+							}
+							urlval = currentUrl.ResolveReference(url).String()
 						} else {
 							// it's probably a link elsewhere or a non-web scheme
 							continue
