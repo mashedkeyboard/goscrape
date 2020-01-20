@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"golang.org/x/net/html"
 	"log"
+	"strings"
 )
 
 func fetchUrl(link linkToCrawl, workerNum int) {
@@ -17,15 +18,19 @@ func fetchUrl(link linkToCrawl, workerNum int) {
 		log.Println("Errored while fetching link ", link.url, " (error: ", err, ")")
 		return
 	}
-
-	doc, err = html.Parse(resp.Body)
-	if err != nil {
-		log.Println("Errored while parsing body of link ", link.url, " (error: ", err, ")")
-		return
+	
+	if resp.Header.Get("Content-Type") == "text/html" || strings.HasPrefix(resp.Header.Get("Content-Type"), "text/html;") {
+		doc, err = html.Parse(resp.Body)
+		if err != nil {
+			log.Println("Errored while parsing body of link ", link.url, " (error: ", err, ")")
+			return
+		}
+		log.Println("Fetched ", link.url, ", parsing")
+		parseNode(doc, link, workerNum)
+	} else {
+		log.Println("Link ", link.url, " is not HTML, ignoring")
 	}
 
-	log.Println("Fetched ", link.url, ", parsing")
-	parseNode(doc, link, workerNum)
 	resp.Body.Close()
 
 	// workerNum of -1 indicates the main thread
