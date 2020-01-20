@@ -14,27 +14,28 @@ func fetchUrl(link linkToCrawl, workerNum int) {
 
 	rl.Take()
 	resp, err = http.Get(link.url)
-	if err != nil {
-		log.Println("Errored while fetching link ", link.url, " (error: ", err, ")")
-		return
-	}
-
-	if resp.Header.Get("Content-Type") == "text/html" || strings.HasPrefix(resp.Header.Get("Content-Type"), "text/html;") {
-		doc, err = html.Parse(resp.Body)
-		if err != nil {
-			log.Println("Errored while parsing body of link ", link.url, " (error: ", err, ")")
-			return
+	if err == nil {
+		if resp.Header.Get("Content-Type") == "text/html" || strings.HasPrefix(resp.Header.Get("Content-Type"), "text/html;") {
+			doc, err = html.Parse(resp.Body)
+			if err == nil {
+				log.Println("Fetched ", link.url, ", parsing")
+				parseNode(doc, link, workerNum)
+			} else {
+				log.Println("Errored while parsing body of link ", link.url, " (error: ", err, ")")
+			}
+		} else {
+			log.Println("Link ", link.url, " is not HTML, ignoring")
 		}
-		log.Println("Fetched ", link.url, ", parsing")
-		parseNode(doc, link, workerNum)
+	
+		resp.Body.Close()
 	} else {
-		log.Println("Link ", link.url, " is not HTML, ignoring")
+		log.Println("Errored while fetching link ", link.url, " (error: ", err, ")")
 	}
-
-	resp.Body.Close()
 
 	// workerNum of -1 indicates the main thread
 	if workerNum != -1 {
 		checkEnd(workerNum)
 	}
+
+	return
 }

@@ -18,7 +18,7 @@ func crawlThread(workerNum int) {
 		for link := range linkQueue.channel {
 			workerStates[workerNum] = 1
 			fetchUrl(link, workerNum)
-			workerStates[workerNum] = 0
+			// workerNum is reset in the checkEnd portion
 		}
 	} else {
 		// unlock down here too, if the link queue is in fact done
@@ -48,6 +48,7 @@ func checkEnd(workerNum int) {
 			close(linkQueue.channel)
 		}
 	}
+	workerStates[workerNum] = 0
 	linkQueue.mux.Unlock()
 	return
 }
